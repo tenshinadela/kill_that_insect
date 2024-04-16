@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Kill That Insect</title>
+    <style>
+        body {
+            position: relative;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            background: #85C1E9;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        .insect {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+        }
+
+        #score,
+        #timer {
+            background: #154360;
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: white;
+        }
+
+        #score {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        #timer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        #selection {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        #insects {
+            display: flex;
+            gap: 50px;
+        }
+
+        .insect-selection {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 120px;
+        }
+
+        button {
+            background: #2980B9;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            margin-top: 50px;
+        }
+
+        button:hover {
+            background: #3498DB;
+        }
+
+        img {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        #countdown {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            font-size: 3em;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        #playAgain {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 10px 20px;
+            display: none;
+            background: #2980B9;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #playAgain:hover {
+            background: #3498DB;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="score">Score: 0</div>
+    <div id="timer">Time: 60</div>
+    <div id="selection">
+        <h2>Select Your Insect</h2>
+        <div id="insects">
+            <div class="insect-selection">
+                <button onclick="startGame('mosquito.png')">Mosquito</button>
+                <img src="mosquito.png" alt="Mosquito">
+            </div>
+            <div class="insect-selection">
+                <button onclick="startGame('cockroach.png')">Cockroach</button>
+                <img src="cockroach.png" alt="Cockroach">
+            </div>
+            <div class="insect-selection">
+                <button onclick="startGame('fly.png')">Fly</button>
+                <img src="fly.png" alt="Fly">
+            </div>
+        </div>
+    </div>
+    <div id="countdown"></div>
+    <button id="playAgain" onclick="resetGame()">Play Again</button>
+
+    <script>
+        let selectedInsect = '';
+        let score = 0;
+        let time = 60;
+        let gameInterval;
+
+        const updateScore = () => {
+            document.getElementById('score').innerText = "Score: " + score;
+        }
+
+        const updateTime = () => {
+            document.getElementById('timer').innerText = "Time: " + time;
+            if (time <= 0) {
+                clearInterval(gameInterval);
+                document.getElementById('countdown').style.display = 'flex';
+                document.getElementById('countdown').innerText = 'Game Over! Your score is ' + score;
+                document.getElementById('playAgain').style.display = 'block';
+            }
+        }
+
+        const addInsect = () => {
+            let insect = document.createElement('img');
+            insect.src = selectedInsect;
+            insect.className = 'insect';
+            insect.style.top = Math.random() * (window.innerHeight - 50) + 'px';
+            insect.style.left = Math.random() * (window.innerWidth - 50) + 'px';
+            insect.onclick = () => {
+                insect.remove();
+                score++;
+                updateScore();
+            }
+            document.body.appendChild(insect);
+        }
+
+        const startGame = (insect) => {
+            selectedInsect = insect;
+            document.getElementById('selection').style.display = 'none';
+
+            let countdown = 3;
+            let countdownInterval = setInterval(() => {
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    document.getElementById('countdown').style.display = 'none';
+
+                    gameInterval = setInterval(() => {
+                        time--;
+                        updateTime();
+                        addInsect();
+                    }, 1000);
+                } else {
+                    document.getElementById('countdown').style.display = 'flex';
+                    document.getElementById('countdown').innerText = 'Starting in ' + countdown;
+                    countdown--;
+                }
+            }, 1000);
+        }
+
+        const resetGame = () => {
+            selectedInsect = '';
+            score = 0;
+            time = 60;
+            document.getElementById('score').innerText = 'Score: 0';
+            document.getElementById('timer').innerText = 'Time: 60';
+            document.getElementById('playAgain').style.display = 'none';
+            document.getElementById('countdown').style.display = 'none';
+            document.getElementById('selection').style.display = 'flex';
+
+            // Remove remaining insects from the previous game
+            let insects = document.getElementsByClassName('insect');
+            while (insects[0]) {
+                insects[0].parentNode.removeChild(insects[0]);
+            }
+        }
+    </script>
+</body>
+
+</html>
